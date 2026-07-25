@@ -31,7 +31,14 @@ jobs:
 
       - name: Build web assets
         run: npm run build
-
+       - name: Debug build output
+  run: |
+    echo "===== .output ====="
+    ls -R .output || true
+    echo "===== dist ====="
+    ls -R dist || true
+    echo "===== public ====="
+    ls -R public || true
       - name: Prepare www folder for Capacitor
         run: |
           rm -rf www
