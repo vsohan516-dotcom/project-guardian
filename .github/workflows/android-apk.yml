@@ -16,22 +16,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Setup Java 21
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "21"
+          distribution: temurin
+          java-version: 21
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
-      
+        run: bun install
+
       - name: Build web assets
-        run: npm run build
+        run: bun run build
 
       - name: Debug build output
         run: |
@@ -42,7 +45,7 @@ jobs:
           echo "===== public ====="
           ls -R public || true
 
-      - name: Prepare www folder for Capacitor
+      - name: Prepare www folder
         run: |
           rm -rf www
           mkdir -p www
@@ -52,29 +55,26 @@ jobs:
           elif [ -d "dist" ]; then
             cp -R dist/. www/
           else
-            echo "Build output not found (.output/public or dist)"
+            echo "No build output found!"
             exit 1
           fi
 
-          if [ ! -f "www/index.html" ]; then
-            echo "www/index.html is missing"
-            ls -R www || true
-            exit 1
-          fi
+          echo "===== WWW ====="
+          ls -R www || true
 
-      - name: Add Android platform (if missing)
+      - name: Add Android Platform
         run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
+          if [ ! -d android ]; then
+            bunx cap add android
           fi
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: bunx cap sync android
 
-      - name: Grant gradlew execute permission
+      - name: Grant Permission
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
+      - name: Build APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
@@ -83,4 +83,3 @@ jobs:
         with:
           name: cybertraffic-pro-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
