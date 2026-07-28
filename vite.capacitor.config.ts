@@ -1,22 +1,21 @@
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 /**
  * Vite config for Capacitor build.
- * Produces static assets for www/ folder (no SSR server).
+ * Uses plain Vite (not TanStack Start / Nitro) so outDir is respected.
  */
 export default defineConfig({
-  tanstackStart: {
-    ssr: false,
-  },
-  vite: {
-    build: {
-      outDir: ".output/capacitor",
-      rollupOptions: {
-        output: {
-          entryFileNames: "[name].js",
-          chunkFileNames: "[name].js",
-          assetFileNames: "[name].[ext]",
-        },
+  plugins: [react(), tsconfigPaths(), tailwindcss()],
+  build: {
+    outDir: ".output/capacitor",
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        index: "index.capacitor.html",
       },
     },
   },
