@@ -1,3 +1,4 @@
+
 #!/usr/bin/env node
 /**
  * Prepare Capacitor web build output.
@@ -34,7 +35,6 @@ async function prepareCapacitorWeb() {
     files.forEach((file) => {
       const src = path.join(sourceDir, file);
       const dest = path.join(targetDir, file);
-
       if (fs.statSync(src).isDirectory()) {
         fs.cpSync(src, dest, { recursive: true });
       } else {
@@ -44,9 +44,17 @@ async function prepareCapacitorWeb() {
 
     console.log(`✅ Copied ${sourceDir} → ${targetDir}`);
 
+    // Rename index.capacitor.html → index.html (Vite keeps the source filename)
+    const capacitorHtml = path.join(targetDir, "index.capacitor.html");
+    const indexHtml = path.join(targetDir, "index.html");
+    if (fs.existsSync(capacitorHtml) && !fs.existsSync(indexHtml)) {
+      fs.copyFileSync(capacitorHtml, indexHtml);
+      fs.rmSync(capacitorHtml);
+      console.log("✅ Renamed index.capacitor.html → index.html");
+    }
+
     // Verify index.html exists
-    const indexPath = path.join(targetDir, "index.html");
-    if (!fs.existsSync(indexPath)) {
+    if (!fs.existsSync(indexHtml)) {
       console.error(`❌ index.html not found in ${targetDir}`);
       process.exit(1);
     }
