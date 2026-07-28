@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-/**
  * Prepare Capacitor web build output.
  * Copies .output/capacitor to www/ and ensures index.html is present.
  */
@@ -16,18 +14,14 @@ const targetDir = path.join(projectRoot, "www");
 
 async function prepareCapacitorWeb() {
   try {
-    // Remove old www folder
     if (fs.existsSync(targetDir)) {
       fs.rmSync(targetDir, { recursive: true, force: true });
     }
 
-    // Create www directory
     fs.mkdirSync(targetDir, { recursive: true });
 
-    // Copy build output
     if (!fs.existsSync(sourceDir)) {
       console.error(`❌ Build output not found at ${sourceDir}`);
-      console.error("Run: npm run build:capacitor");
       process.exit(1);
     }
 
@@ -44,7 +38,6 @@ async function prepareCapacitorWeb() {
 
     console.log(`✅ Copied ${sourceDir} → ${targetDir}`);
 
-    // Rename index.capacitor.html → index.html (Vite keeps the source filename)
     const capacitorHtml = path.join(targetDir, "index.capacitor.html");
     const indexHtml = path.join(targetDir, "index.html");
     if (fs.existsSync(capacitorHtml) && !fs.existsSync(indexHtml)) {
@@ -53,7 +46,6 @@ async function prepareCapacitorWeb() {
       console.log("✅ Renamed index.capacitor.html → index.html");
     }
 
-    // Verify index.html exists
     if (!fs.existsSync(indexHtml)) {
       console.error(`❌ index.html not found in ${targetDir}`);
       process.exit(1);
